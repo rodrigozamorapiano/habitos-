@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hábitos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root{
+    --cream:      #F7F2E9;
+    --cream-alt:  #EFE6D6;
+    --ink:        #2B271F;
+    --ink-soft:   #7A7264;
+    --forest:     #3F6B4F;
+    --forest-dim: #7FA688;
+    --clay:       #B5624A;
+    --plum:       #7A5C7E;
+    --line:       #E1D6C1;
+    --white:      #FFFDF8;
+  }
+
+  body{
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 44px 20px 90px;
+  }
+
+  .wrap{ max-width: 920px; margin: 0 auto; }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-style: italic;
+    font-size: clamp(30px, 5vw, 42px);
+    margin-bottom: 6px;
+  }
+  .subt{ color: var(--ink-soft); font-size: 14px; margin-bottom: 36px; }
+
+  .panel{
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 26px;
+    margin-bottom: 22px;
+  }
+
+  .panel-title{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 19px;
+    margin-bottom: 4px;
+  }
+  .panel-sub{ font-size: 13px; color: var(--ink-soft); margin-bottom: 20px; }
+
+  /* ---- fecha ---- */
+  .date-row{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .date-row input[type="date"]{
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .day-score{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--forest);
+  }
+
+  /* ---- hidratación (contador) ---- */
+  .hydration{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: var(--cream);
+  }
+  .hydration.complete{ background: var(--forest); border-color: var(--forest); }
+  .hydration.complete .hyd-label,
+  .hydration.complete .hyd-count{ color: var(--white); }
+
+  .hyd-label{ font-size: 13.5px; font-weight: 500; }
+  .hyd-glasses{ display: flex; gap: 4px; flex-wrap: wrap; max-width: 220px; }
+  .hyd-glass{
+    width: 14px; height: 14px;
+    border-radius: 3px;
+    border: 1.5px solid var(--forest-dim);
+    background: transparent;
+  }
+  .hyd-glass.on{ background: var(--forest); border-color: var(--forest); }
+  .hydration.complete .hyd-glass{ border-color: var(--white); }
+  .hydration.complete .hyd-glass.on{ background: var(--white); }
+
+  .hyd-controls{ display: flex; align-items: center; gap: 10px; }
+  .hyd-btn{
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--forest);
+    background: transparent;
+    color: var(--forest);
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .hydration.complete .hyd-btn{ border-color: var(--white); color: var(--white); }
+  .hyd-count{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; min-width: 42px; text-align: center; }
+
+  /* ---- checklist ---- */
+  .habit-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .habit{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--cream);
+    transition: background 0.15s ease, border-color 0.15s ease;
+    user-select: none;
+  }
+  .habit:hover{ border-color: var(--forest-dim); }
+  .habit.checked{
+    background: var(--forest);
+    border-color: var(--forest);
+  }
+  .habit.checked .habit-label{ color: var(--white); }
+  .habit.checked .habit-box{ background: var(--white); border-color: var(--white); }
+  .habit.checked .habit-box::after{ opacity: 1; }
+
+  .habit-box{
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    border: 1.5px solid var(--ink-soft);
+    flex-shrink: 0;
+    position: relative;
+  }
+  .habit-box::after{
+    content: '✓';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: var(--forest);
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .habit-label{
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ---- metas semanales (ejercicio / minoxidil) ---- */
+  .weekly-goals{
+    display: flex;
+    gap: 28px;
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .weekly-goal{ display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-soft); }
+  .weekly-goal .dots{ display: flex; gap: 5px; }
+  .weekly-goal .dot{ width: 12px; height: 12px; border-radius: 50%; }
+  .weekly-goal.ejercicio .dot{ border: 1.5px solid var(--clay); }
+  .weekly-goal.ejercicio .dot.on{ background: var(--clay); }
+  .weekly-goal.ejercicio b{ color: var(--clay); font-weight: 600; }
+  .weekly-goal.minoxidil .dot{ border: 1.5px solid var(--plum); }
+  .weekly-goal.minoxidil .dot.on{ background: var(--plum); }
+  .weekly-goal.minoxidil b{ color: var(--plum); font-weight: 600; }
+
+  .toggle-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .weekly-goal.ejercicio .toggle-chip{ border: 1px solid var(--clay); color: var(--clay); }
+  .weekly-goal.ejercicio .toggle-chip.active{ background: var(--clay); color: var(--white); }
+  .weekly-goal.minoxidil .toggle-chip{ border: 1px solid var(--plum); color: var(--plum); }
+  .weekly-goal.minoxidil .toggle-chip.active{ background: var(--plum); color: var(--white); }
+
+  /* ---- heatmap del año ---- */
+  .heatmap-scroll{ overflow-x: auto; padding-bottom: 6px; }
+  .heatmap{
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(7, 12px);
+    gap: 3px;
+    width: max-content;
+  }
+  .heat-cell{
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    background: var(--cream-alt);
+  }
+  .month-labels{
+    display: grid;
+    grid-auto-flow: column;
+    gap: 3px;
+    width: max-content;
+    margin-bottom: 6px;
+    font-size: 10px;
+    color: var(--ink-soft);
+  }
+  .month-labels span{ min-width: 12px; }
+
+  .heatmap-legend{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--ink-soft);
+  }
+
+  .year-stats{
+    display: flex;
+    gap: 26px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .year-stat .n{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--forest);
+  }
+  .year-stat .l{ font-size: 12px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>Hábitos</h1>
+  <p class="subt">Hidratación (10 vasos) · Sol · Ejercicio (3×/semana) · Agua fría · Comer sano · Caminar · Higiene · Socializar · Disciplina · Minoxidil (5×/semana)</p>
+
+  <div class="panel">
+    <div class="panel-title">Hoy</div>
+    <div class="panel-sub" id="date-display">—</div>
+
+    <div class="date-row">
+      <input type="date" id="input-date">
+      <div class="day-score" id="day-score">0 / 8</div>
+    </div>
+
+    <div class="hydration" id="hydration-block">
+      <div>
+        <div class="hyd-label">Hidratación</div>
+        <div class="hyd-glasses" id="hyd-glasses"></div>
+      </div>
+      <div class="hyd-controls">
+        <button class="hyd-btn" id="hyd-minus">−</button>
+        <div class="hyd-count" id="hyd-count">0/10</div>
+        <button class="hyd-btn" id="hyd-plus">+</button>
+      </div>
+    </div>
+
+    <div class="habit-grid" id="habit-grid"></div>
+
+    <div class="weekly-goals">
+      <div class="weekly-goal ejercicio">
+        <span>Ejercicio:</span>
+        <div class="dots" id="exercise-dots"></div>
+        <b id="exercise-count">0/3</b>
+        <span class="toggle-chip" id="exercise-toggle">marcar hoy</span>
+      </div>
+      <div class="weekly-goal minoxidil">
+        <span>Minoxidil:</span>
+        <div class="dots" id="minoxidil-dots"></div>
+        <b id="minoxidil-count">0/5</b>
+        <span class="toggle-chip" id="minoxidil-toggle">marcar hoy</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">El año completo</div>
+    <div class="panel-sub" id="year-label">—</div>
+
+    <div class="heatmap-scroll">
+      <div class="month-labels" id="month-labels"></div>
+      <div class="heatmap" id="heatmap"></div>
+    </div>
+
+    <div class="heatmap-legend">
+      <span>Menos</span>
+      <div class="heat-cell" style="background:#EFE6D6"></div>
+      <div class="heat-cell" style="background:#CBDCCF"></div>
+      <div class="heat-cell" style="background:#9DBFA6"></div>
+      <div class="heat-cell" style="background:#6C9C79"></div>
+      <div class="heat-cell" style="background:#3F6B4F"></div>
+      <span>Más</span>
+    </div>
+
+    <div class="year-stats">
+      <div class="year-stat"><div class="n" id="stat-avg">0%</div><div class="l">Promedio del año</div></div>
+      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (7/7)</div></div>
+      <div class="year-stat"><div class="n" id="stat-streak">0</div><div class="l">Racha actual</div></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const HABITS = [
+    { key: 'sol', label: 'Tomar el sol' },
+    { key: 'aguafria', label: 'Agua fría' },
+    { key: 'comer', label: 'Comer sano' },
+    { key: 'caminar', label: 'Caminar' },
+    { key: 'higiene', label: 'Higiene' },
+    { key: 'social', label: 'Socializar' },
+    { key: 'disciplina', label: 'Disciplina' }
+  ];
+  const HYDRATION_TARGET = 10;
+  const WEEKLY = [
+    { key: 'ejercicio', target: 3 },
+    { key: 'minoxidil', target: 5 }
+  ];
+
+  const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+
+  function pad(n){ return String(n).padStart(2,'0'); }
+  function toISO(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+  function fromISO(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); }
+  function todayISO(){ return toISO(new Date()); }
+
+  function getDay(iso){
+    try{
+      const raw = localStorage.getItem(`habitos:${iso}`);
+      return raw ? JSON.parse(raw) : {};
+    } catch(e){ return {}; }
+  }
+  function saveDay(iso, obj){
+    localStorage.setItem(`habitos:${iso}`, JSON.stringify(obj));
+  }
+
+  // score diario sobre 8: los 7 hábitos booleanos + hidratación completa (10/10)
+  function dailyScore(dayObj){
+    const boolScore = HABITS.filter(h => dayObj[h.key]).length;
+    const hydOk = (dayObj.hidratacion || 0) >= HYDRATION_TARGET ? 1 : 0;
+    return boolScore + hydOk;
+  }
+
+  let selectedISO = todayISO();
+
+  function renderHydration(){
+    const dayObj = getDay(selectedISO);
+    const count = dayObj.hidratacion || 0;
+    const block = document.getElementById('hydration-block');
+    block.classList.toggle('complete', count >= HYDRATION_TARGET);
+
+    document.getElementById('hyd-count').textContent = `${count}/${HYDRATION_TARGET}`;
+
+    const glassesEl = document.getElementById('hyd-glasses');
+    glassesEl.innerHTML = '';
+    for (let i = 0; i < HYDRATION_TARGET; i++){
+      const g = document.createElement('div');
+      g.className = 'hyd-glass' + (i < count ? ' on' : '');
+      glassesEl.appendChild(g);
+    }
+  }
+
+  function changeHydration(delta){
+    const dayObj = getDay(selectedISO);
+    let count = (dayObj.hidratacion || 0) + delta;
+    count = Math.max(0, Math.min(HYDRATION_TARGET, count));
+    dayObj.hidratacion = count;
+    saveDay(selectedISO, dayObj);
+    renderHydration();
+    renderDayScore();
+    renderHeatmap();
+  }
+
+  function renderDayScore(){
+    const dayObj = getDay(selectedISO);
+    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 8`;
+    const d = fromISO(selectedISO);
+    document.getElementById('date-display').textContent =
+      d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+  }
+
+  function renderChecklist(){
+    const dayObj = getDay(selectedISO);
+    const grid = document.getElementById('habit-grid');
+    grid.innerHTML = '';
+
+    HABITS.forEach(h => {
+      const el = document.createElement('div');
+      el.className = 'habit' + (dayObj[h.key] ? ' checked' : '');
+      el.innerHTML = `<div class="habit-box"></div><span class="habit-label">${h.label}</span>`;
+      el.addEventListener('click', () => {
+        const current = getDay(selectedISO);
+        current[h.key] = !current[h.key];
+        saveDay(selectedISO, current);
+        renderChecklist();
+        renderDayScore();
+        renderHeatmap();
+      });
+      grid.appendChild(el);
+    });
+
+    renderDayScore();
+  }
+
+  function weekMondayFor(iso){
+    const base = fromISO(iso);
+    const dow = (base.getDay() + 6) % 7;
+    const monday = new Date(base);
+    monday.setDate(base.getDate() - dow);
+    return monday;
+  }
+
+  function renderWeekly(key, target, dotsId, countId, toggleId){
+    const monday = weekMondayFor(selectedISO);
+    let count = 0;
+    for (let i = 0; i < 7; i++){
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const dayObj = getDay(toISO(d));
+      if (dayObj[key]) count++;
+    }
+    const dotsEl = document.getElementById(dotsId);
+    dotsEl.innerHTML = '';
+    for (let i = 0; i < target; i++){
+      const dot = document.createElement('div');
+      dot.className = 'dot' + (i < count ? ' on' : '');
+      dotsEl.appendChild(dot);
+    }
+    document.getElementById(countId).textContent = `${count}/${target}`;
+
+    const dayObj = getDay(selectedISO);
+    const toggleEl = document.getElementById(toggleId);
+    toggleEl.classList.toggle('active', !!dayObj[key]);
+    toggleEl.textContent = dayObj[key] ? 'marcado hoy ✓' : 'marcar hoy';
+  }
+
+  function renderAllWeekly(){
+    renderWeekly('ejercicio', 3, 'exercise-dots', 'exercise-count', 'exercise-toggle');
+    renderWeekly('minoxidil', 5, 'minoxidil-dots', 'minoxidil-count', 'minoxidil-toggle');
+  }
+
+  function colorForPct(pct){
+    if (pct <= 0) return '#EFE6D6';
+    const stops = [
+      [239, 230, 214],
+      [203, 220, 207],
+      [157, 191, 166],
+      [108, 156, 121],
+      [63, 107, 79]
+    ];
+    const scaled = pct * (stops.length - 1);
+    const idx = Math.min(Math.floor(scaled), stops.length - 2);
+    const t = scaled - idx;
+    const rgb = stops[idx].map((c,i) => Math.round(c + (stops[idx+1][i]-c)*t));
+    return `rgb(${rgb.join(',')})`;
+  }
+
+  function renderHeatmap(){
+    const year = new Date().getFullYear();
+    document.getElementById('year-label').textContent = `${year} · consistencia diaria (8 hábitos)`;
+
+    const jan1 = new Date(year, 0, 1);
+    const dec31 = new Date(year, 11, 31);
+    const startOffset = (jan1.getDay() + 6) % 7;
+
+    const heat = document.getElementById('heatmap');
+    const monthLabels = document.getElementById('month-labels');
+    heat.innerHTML = '';
+    monthLabels.innerHTML = '';
+
+    let cursor = new Date(jan1);
+    cursor.setDate(cursor.getDate() - startOffset);
+
+    let totalPct = 0, totalDaysWithData = 0, perfectDays = 0;
+    let lastMonthLabeled = -1;
+    let weekIndex = 0;
+
+    while (cursor <= dec31) {
+      for (let dow = 0; dow < 7; dow++){
+        const d = new Date(cursor);
+        d.setDate(cursor.getDate() + dow);
+        const cell = document.createElement('div');
+        cell.className = 'heat-cell';
+
+        if (d.getFullYear() === year){
+          const iso = toISO(d);
+          const dayObj = getDay(iso);
+          const score = dailyScore(dayObj);
+          const hasData = Object.keys(dayObj).length > 0;
+          const pct = score / 8;
+          cell.style.background = hasData ? colorForPct(pct) : '#EFE6D6';
+          cell.title = `${iso} · ${score}/8`;
+          if (hasData){
+            totalPct += pct;
+            totalDaysWithData++;
+            if (score === 8) perfectDays++;
+          }
+        } else {
+          cell.style.opacity = '0';
+        }
+        heat.appendChild(cell);
+
+        if (dow === 0 && d.getFullYear() === year && d.getMonth() !== lastMonthLabeled){
+          lastMonthLabeled = d.getMonth();
+          const label = document.createElement('span');
+          label.textContent = MESES[d.getMonth()];
+          label.style.gridColumn = `${weekIndex + 1}`;
+          monthLabels.appendChild(label);
+        }
+      }
+      cursor.setDate(cursor.getDate() + 7);
+      weekIndex++;
+    }
+
+    let currentStreak = 0;
+    let d = fromISO(todayISO());
+    while (true){
+      const dayObj = getDay(toISO(d));
+      if (dailyScore(dayObj) >= 6){
+        currentStreak++;
+        d.setDate(d.getDate() - 1);
+      } else break;
+    }
+
+    document.getElementById('stat-avg').textContent =
+      totalDaysWithData > 0 ? `${Math.round((totalPct/totalDaysWithData)*100)}%` : '0%';
+    document.getElementById('stat-perfect').textContent = perfectDays;
+    document.getElementById('stat-streak').textContent = currentStreak;
+  }
+
+  document.getElementById('hyd-plus').addEventListener('click', () => changeHydration(1));
+  document.getElementById('hyd-minus').addEventListener('click', () => changeHydration(-1));
+
+  document.getElementById('exercise-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.ejercicio = !dayObj.ejercicio;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
+  document.getElementById('minoxidil-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.minoxidil = !dayObj.minoxidil;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
+
+  document.getElementById('input-date').addEventListener('change', (e) => {
+    selectedISO = e.target.value;
+    renderHydration();
+    renderChecklist();
+    renderAllWeekly();
+  });
+
+  (function init(){
+    document.getElementById('input-date').value = selectedISO;
+    renderHydration();
+    renderChecklist();
+    renderAllWeekly();
+    renderHeatmap();
+  })();
+</script>
+</body>
+</html>
