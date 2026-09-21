@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hábitos</title>
+<title>index</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -38,9 +38,8 @@
     font-weight: 600;
     font-style: italic;
     font-size: clamp(30px, 5vw, 42px);
-    margin-bottom: 6px;
+    margin-bottom: 36px;
   }
-  .subt{ color: var(--ink-soft); font-size: 14px; margin-bottom: 36px; }
 
   .panel{
     background: var(--white);
@@ -267,7 +266,6 @@
 <div class="wrap">
 
   <h1>Hábitos</h1>
-  <p class="subt">Hidratación (10 vasos) · Sol · Ejercicio (3×/semana) · Agua fría · Comer sano · Caminar · Higiene · Socializar · Disciplina · Minoxidil (5×/semana)</p>
 
   <div class="panel">
     <div class="panel-title">Hoy</div>
@@ -275,7 +273,7 @@
 
     <div class="date-row">
       <input type="date" id="input-date">
-      <div class="day-score" id="day-score">0 / 8</div>
+      <div class="day-score" id="day-score">0 / 14</div>
     </div>
 
     <div class="hydration" id="hydration-block">
@@ -329,7 +327,7 @@
 
     <div class="year-stats">
       <div class="year-stat"><div class="n" id="stat-avg">0%</div><div class="l">Promedio del año</div></div>
-      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (7/7)</div></div>
+      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (14/14)</div></div>
       <div class="year-stat"><div class="n" id="stat-streak">0</div><div class="l">Racha actual</div></div>
     </div>
   </div>
@@ -344,7 +342,13 @@
     { key: 'caminar', label: 'Caminar' },
     { key: 'higiene', label: 'Higiene' },
     { key: 'social', label: 'Socializar' },
-    { key: 'disciplina', label: 'Disciplina' }
+    { key: 'disciplina', label: 'Disciplina' },
+    { key: 'respiracion', label: 'Respiración' },
+    { key: 'dormir', label: 'Dormir 8 horas' },
+    { key: 'limpieza', label: 'Limpieza del entorno' },
+    { key: 'estudio', label: 'Estudio' },
+    { key: 'autoconocimiento', label: 'Autoconocimiento' },
+    { key: 'feliz', label: 'Ser feliz' }
   ];
   const HYDRATION_TARGET = 10;
   const WEEKLY = [
@@ -408,7 +412,7 @@
 
   function renderDayScore(){
     const dayObj = getDay(selectedISO);
-    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 8`;
+    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 14`;
     const d = fromISO(selectedISO);
     document.getElementById('date-display').textContent =
       d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -492,7 +496,7 @@
 
   function renderHeatmap(){
     const year = new Date().getFullYear();
-    document.getElementById('year-label').textContent = `${year} · consistencia diaria (8 hábitos)`;
+    document.getElementById('year-label').textContent = `${year} · consistencia diaria (14 hábitos)`;
 
     const jan1 = new Date(year, 0, 1);
     const dec31 = new Date(year, 11, 31);
@@ -522,13 +526,13 @@
           const dayObj = getDay(iso);
           const score = dailyScore(dayObj);
           const hasData = Object.keys(dayObj).length > 0;
-          const pct = score / 8;
+          const pct = score / 14;
           cell.style.background = hasData ? colorForPct(pct) : '#EFE6D6';
-          cell.title = `${iso} · ${score}/8`;
+          cell.title = `${iso} · ${score}/14`;
           if (hasData){
             totalPct += pct;
             totalDaysWithData++;
-            if (score === 8) perfectDays++;
+            if (score === 14) perfectDays++;
           }
         } else {
           cell.style.opacity = '0';
@@ -551,7 +555,7 @@
     let d = fromISO(todayISO());
     while (true){
       const dayObj = getDay(toISO(d));
-      if (dailyScore(dayObj) >= 6){
+      if (dailyScore(dayObj) >= 11){
         currentStreak++;
         d.setDate(d.getDate() - 1);
       } else break;
