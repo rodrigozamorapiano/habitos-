@@ -274,7 +274,7 @@
 
     <div class="date-row">
       <input type="date" id="input-date">
-      <div class="day-score" id="day-score">0 / 15</div>
+      <div class="day-score" id="day-score">0 / 16</div>
     </div>
 
     <div class="hydration" id="hydration-block">
@@ -328,7 +328,7 @@
 
     <div class="year-stats">
       <div class="year-stat"><div class="n" id="stat-avg">0%</div><div class="l">Promedio del año</div></div>
-      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (15/15)</div></div>
+      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (16/16)</div></div>
       <div class="year-stat"><div class="n" id="stat-streak">0</div><div class="l">Racha actual</div></div>
     </div>
   </div>
@@ -350,7 +350,8 @@
     { key: 'estudio', label: 'Estudio' },
     { key: 'autoconocimiento', label: 'Autoconocimiento' },
     { key: 'feliz', label: 'Ser feliz' },
-    { key: 'brilliant', label: 'Brilliant (lección de matemáticas)' }
+    { key: 'brilliant', label: 'Brilliant (lección de matemáticas)' },
+    { key: 'redes', label: 'Redes sociales solo 9:00 pm (10 min)' }
   ];
   const HYDRATION_TARGET = 8;
   const WEEKLY = [
@@ -414,7 +415,7 @@
 
   function renderDayScore(){
     const dayObj = getDay(selectedISO);
-    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 15`;
+    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 16`;
     const d = fromISO(selectedISO);
     document.getElementById('date-display').textContent =
       d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -498,7 +499,7 @@
 
   function renderHeatmap(){
     const year = new Date().getFullYear();
-    document.getElementById('year-label').textContent = `${year} · consistencia diaria (15 hábitos)`;
+    document.getElementById('year-label').textContent = `${year} · consistencia diaria (16 hábitos)`;
 
     const jan1 = new Date(year, 0, 1);
     const dec31 = new Date(year, 11, 31);
@@ -528,13 +529,13 @@
           const dayObj = getDay(iso);
           const score = dailyScore(dayObj);
           const hasData = Object.keys(dayObj).length > 0;
-          const pct = score / 15;
+          const pct = score / 16;
           cell.style.background = hasData ? colorForPct(pct) : '#EFE6D6';
-          cell.title = `${iso} · ${score}/15`;
+          cell.title = `${iso} · ${score}/16`;
           if (hasData){
             totalPct += pct;
             totalDaysWithData++;
-            if (score === 15) perfectDays++;
+            if (score === 16) perfectDays++;
           }
         } else {
           cell.style.opacity = '0';
@@ -557,7 +558,7 @@
     let d = fromISO(todayISO());
     while (true){
       const dayObj = getDay(toISO(d));
-      if (dailyScore(dayObj) >= 11){ // ~75% de 15
+      if (dailyScore(dayObj) >= 12){ // ~75% de 16
         currentStreak++;
         d.setDate(d.getDate() - 1);
       } else break;
