@@ -230,13 +230,14 @@
   .month-labels{
     display: grid;
     grid-auto-flow: column;
+    grid-auto-columns: 12px;
     gap: 3px;
     width: max-content;
     margin-bottom: 6px;
     font-size: 10px;
     color: var(--ink-soft);
   }
-  .month-labels span{ min-width: 12px; }
+  .month-labels span{ min-width: 12px; white-space: nowrap; }
 
   .heatmap-legend{
     display: flex;
