@@ -19,6 +19,8 @@
     --forest-dim: #7FA688;
     --clay:       #B5624A;
     --plum:       #7A5C7E;
+    --ochre:      #C79A3D;
+    --slate:      #5C7A8A;
     --line:       #E1D6C1;
     --white:      #FFFDF8;
   }
@@ -197,6 +199,12 @@
   .weekly-goal.minoxidil .dot{ border: 1.5px solid var(--plum); }
   .weekly-goal.minoxidil .dot.on{ background: var(--plum); }
   .weekly-goal.minoxidil b{ color: var(--plum); font-weight: 600; }
+  .weekly-goal.crecimiento .dot{ border: 1.5px solid var(--ochre); }
+  .weekly-goal.crecimiento .dot.on{ background: var(--ochre); }
+  .weekly-goal.crecimiento b{ color: var(--ochre); font-weight: 600; }
+  .weekly-goal.calzado .dot{ border: 1.5px solid var(--slate); }
+  .weekly-goal.calzado .dot.on{ background: var(--slate); }
+  .weekly-goal.calzado b{ color: var(--slate); font-weight: 600; }
 
   .toggle-chip{
     display: inline-flex;
@@ -212,6 +220,10 @@
   .weekly-goal.ejercicio .toggle-chip.active{ background: var(--clay); color: var(--white); }
   .weekly-goal.minoxidil .toggle-chip{ border: 1px solid var(--plum); color: var(--plum); }
   .weekly-goal.minoxidil .toggle-chip.active{ background: var(--plum); color: var(--white); }
+  .weekly-goal.crecimiento .toggle-chip{ border: 1px solid var(--ochre); color: var(--ochre); }
+  .weekly-goal.crecimiento .toggle-chip.active{ background: var(--ochre); color: var(--white); }
+  .weekly-goal.calzado .toggle-chip{ border: 1px solid var(--slate); color: var(--slate); }
+  .weekly-goal.calzado .toggle-chip.active{ background: var(--slate); color: var(--white); }
 
   /* ---- heatmap del año ---- */
   .heatmap-scroll{ overflow-x: auto; padding-bottom: 6px; }
@@ -304,6 +316,18 @@
         <b id="minoxidil-count">0/5</b>
         <span class="toggle-chip" id="minoxidil-toggle">marcar hoy</span>
       </div>
+      <div class="weekly-goal crecimiento">
+        <span>Crecimiento capilar y uñas:</span>
+        <div class="dots" id="crecimiento-dots"></div>
+        <b id="crecimiento-count">0/1</b>
+        <span class="toggle-chip" id="crecimiento-toggle">marcar hoy</span>
+      </div>
+      <div class="weekly-goal calzado">
+        <span>Limpieza de calzado:</span>
+        <div class="dots" id="calzado-dots"></div>
+        <b id="calzado-count">0/1</b>
+        <span class="toggle-chip" id="calzado-toggle">marcar hoy</span>
+      </div>
     </div>
   </div>
 
@@ -356,7 +380,9 @@
   const HYDRATION_TARGET = 8;
   const WEEKLY = [
     { key: 'ejercicio', target: 3 },
-    { key: 'minoxidil', target: 5 }
+    { key: 'minoxidil', target: 5 },
+    { key: 'crecimiento', target: 1 },
+    { key: 'calzado', target: 1 }
   ];
 
   const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -479,6 +505,8 @@
   function renderAllWeekly(){
     renderWeekly('ejercicio', 3, 'exercise-dots', 'exercise-count', 'exercise-toggle');
     renderWeekly('minoxidil', 5, 'minoxidil-dots', 'minoxidil-count', 'minoxidil-toggle');
+    renderWeekly('crecimiento', 1, 'crecimiento-dots', 'crecimiento-count', 'crecimiento-toggle');
+    renderWeekly('calzado', 1, 'calzado-dots', 'calzado-count', 'calzado-toggle');
   }
 
   function colorForPct(pct){
@@ -583,6 +611,20 @@
   document.getElementById('minoxidil-toggle').addEventListener('click', () => {
     const dayObj = getDay(selectedISO);
     dayObj.minoxidil = !dayObj.minoxidil;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
+  document.getElementById('crecimiento-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.crecimiento = !dayObj.crecimiento;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
+  document.getElementById('calzado-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.calzado = !dayObj.calzado;
     saveDay(selectedISO, dayObj);
     renderAllWeekly();
     renderHeatmap();
