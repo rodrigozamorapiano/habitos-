@@ -21,6 +21,7 @@
     --plum:       #7A5C7E;
     --ochre:      #C79A3D;
     --slate:      #5C7A8A;
+    --teal:       #3F7C7A;
     --line:       #E1D6C1;
     --white:      #FFFDF8;
   }
@@ -205,6 +206,9 @@
   .weekly-goal.calzado .dot{ border: 1.5px solid var(--slate); }
   .weekly-goal.calzado .dot.on{ background: var(--slate); }
   .weekly-goal.calzado b{ color: var(--slate); font-weight: 600; }
+  .weekly-goal.lectura .dot{ border: 1.5px solid var(--teal); }
+  .weekly-goal.lectura .dot.on{ background: var(--teal); }
+  .weekly-goal.lectura b{ color: var(--teal); font-weight: 600; }
 
   .toggle-chip{
     display: inline-flex;
@@ -224,6 +228,104 @@
   .weekly-goal.crecimiento .toggle-chip.active{ background: var(--ochre); color: var(--white); }
   .weekly-goal.calzado .toggle-chip{ border: 1px solid var(--slate); color: var(--slate); }
   .weekly-goal.calzado .toggle-chip.active{ background: var(--slate); color: var(--white); }
+  .weekly-goal.lectura .toggle-chip{ border: 1px solid var(--teal); color: var(--teal); }
+  .weekly-goal.lectura .toggle-chip.active{ background: var(--teal); color: var(--white); }
+
+  /* ---- libro en turno ---- */
+  .libro-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  .libro-row label{ font-size: 13px; color: var(--ink-soft); }
+  .libro-row input[type="text"]{
+    flex: 1;
+    min-width: 180px;
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .libro-row input[type="text"]:focus{ outline: none; border-color: var(--teal); }
+
+  /* ---- registro de cuentas ---- */
+  .finanzas-form{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .finanzas-form select,
+  .finanzas-form input{
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  .finanzas-form input[type="number"]{ width: 110px; }
+  .finanzas-form input[type="text"]{ flex: 1; min-width: 130px; }
+  .fin-add-btn{
+    background: var(--forest);
+    border: none;
+    color: var(--white);
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .fin-add-btn:hover{ opacity: 0.9; }
+
+  .finanzas-list{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .fin-item{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 13px;
+  }
+  .fin-item.ingreso{ border-left: 3px solid var(--forest); }
+  .fin-item.gasto{ border-left: 3px solid var(--clay); }
+  .fin-item .fin-amount{ font-weight: 600; }
+  .fin-item.ingreso .fin-amount{ color: var(--forest); }
+  .fin-item.gasto .fin-amount{ color: var(--clay); }
+  .fin-item .fin-del{
+    cursor: pointer;
+    color: var(--ink-soft);
+    opacity: 0.5;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .fin-item .fin-del:hover{ opacity: 1; color: var(--clay); }
+  .fin-empty{ font-size: 13px; color: var(--ink-soft); opacity: 0.7; font-style: italic; margin-bottom: 16px; }
+
+  .finanzas-summary{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .finanzas-summary .pos{ color: var(--forest); }
+  .finanzas-summary .neg{ color: var(--clay); }
+
+  .ring-legend{ display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11px; color: var(--ink-soft); flex-wrap: wrap; }
+  .ring-swatch{ width: 12px; height: 12px; border-radius: 3px; background: var(--cream-alt); flex-shrink: 0; }
 
   /* ---- heatmap del año ---- */
   .heatmap-scroll{ overflow-x: auto; padding-bottom: 6px; }
@@ -328,7 +430,38 @@
         <b id="calzado-count">0/1</b>
         <span class="toggle-chip" id="calzado-toggle">marcar hoy</span>
       </div>
+      <div class="weekly-goal lectura">
+        <span>Lectura de libro:</span>
+        <div class="dots" id="lectura-dots"></div>
+        <b id="lectura-count">0/1</b>
+        <span class="toggle-chip" id="lectura-toggle">marcar hoy</span>
+      </div>
     </div>
+
+    <div class="libro-row">
+      <label for="input-libro">Libro en turno esta semana:</label>
+      <input type="text" id="input-libro" placeholder="Título del libro...">
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">Registro de cuentas, ingreso y gasto</div>
+    <div class="panel-sub">Agrega los movimientos de este día</div>
+
+    <div class="finanzas-form">
+      <select id="fin-tipo">
+        <option value="ingreso">Ingreso</option>
+        <option value="gasto">Gasto</option>
+      </select>
+      <input type="number" id="fin-cantidad" placeholder="Cantidad" step="0.01" min="0">
+      <input type="text" id="fin-categoria" placeholder="Categoría">
+      <button class="fin-add-btn" id="fin-add">Agregar</button>
+    </div>
+
+    <div class="finanzas-list" id="finanzas-list"></div>
+    <div class="fin-empty" id="fin-empty" style="display:none;">Aún no hay movimientos este día.</div>
+
+    <div class="finanzas-summary" id="finanzas-summary">—</div>
   </div>
 
   <div class="panel">
@@ -348,6 +481,13 @@
       <div class="heat-cell" style="background:#9CB557"></div>
       <div class="heat-cell" style="background:#5A945C"></div>
       <span>Más</span>
+    </div>
+
+    <div class="ring-legend">
+      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #3F6B4F;"></div>
+      <span>Ingresos &gt; gastos</span>
+      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #B5624A;"></div>
+      <span>Gastos &gt; ingresos</span>
     </div>
 
     <div class="year-stats">
@@ -377,12 +517,13 @@
     { key: 'brilliant', label: 'Brilliant (lección de matemáticas)' },
     { key: 'redes', label: 'Redes sociales solo 9:00 pm (10 min)' }
   ];
-  const HYDRATION_TARGET = 8;
+  const HYDRATION_TARGET = 9;
   const WEEKLY = [
     { key: 'ejercicio', target: 3 },
     { key: 'minoxidil', target: 5 },
     { key: 'crecimiento', target: 1 },
-    { key: 'calzado', target: 1 }
+    { key: 'calzado', target: 1 },
+    { key: 'lectura', target: 1 }
   ];
 
   const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -507,6 +648,69 @@
     renderWeekly('minoxidil', 5, 'minoxidil-dots', 'minoxidil-count', 'minoxidil-toggle');
     renderWeekly('crecimiento', 1, 'crecimiento-dots', 'crecimiento-count', 'crecimiento-toggle');
     renderWeekly('calzado', 1, 'calzado-dots', 'calzado-count', 'calzado-toggle');
+    renderWeekly('lectura', 1, 'lectura-dots', 'lectura-count', 'lectura-toggle');
+  }
+
+  // ---- libro en turno (por semana) ----
+  function getLibro(iso){
+    try{ return localStorage.getItem(`libro:${toISO(weekMondayFor(iso))}`) || ''; }
+    catch(e){ return ''; }
+  }
+  function saveLibro(iso, text){
+    localStorage.setItem(`libro:${toISO(weekMondayFor(iso))}`, text);
+  }
+  function renderLibro(){
+    document.getElementById('input-libro').value = getLibro(selectedISO);
+  }
+
+  // ---- registro de cuentas (ingreso / gasto) ----
+  function getFinanzas(iso){
+    const dayObj = getDay(iso);
+    return Array.isArray(dayObj.finanzas) ? dayObj.finanzas : [];
+  }
+  function saveFinanzas(iso, movimientos){
+    const dayObj = getDay(iso);
+    dayObj.finanzas = movimientos;
+    saveDay(iso, dayObj);
+  }
+  function finanzasBalance(iso){
+    return getFinanzas(iso).reduce((sum, m) => sum + (m.tipo === 'ingreso' ? m.cantidad : -m.cantidad), 0);
+  }
+
+  function renderFinanzas(){
+    const movs = getFinanzas(selectedISO);
+    const list = document.getElementById('finanzas-list');
+    const empty = document.getElementById('fin-empty');
+    list.innerHTML = '';
+
+    if (movs.length === 0){
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      movs.forEach((m, i) => {
+        const el = document.createElement('div');
+        el.className = `fin-item ${m.tipo}`;
+        el.innerHTML = `<span>${m.tipo === 'ingreso' ? '↑' : '↓'} <span class="fin-amount">$${m.cantidad.toFixed(2)}</span> · ${m.categoria || 'Sin categoría'}</span><span class="fin-del" data-idx="${i}">×</span>`;
+        list.appendChild(el);
+      });
+      list.querySelectorAll('.fin-del').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = Number(btn.dataset.idx);
+          const current = getFinanzas(selectedISO);
+          current.splice(idx, 1);
+          saveFinanzas(selectedISO, current);
+          renderFinanzas();
+          renderHeatmap();
+        });
+      });
+    }
+
+    const ingresos = movs.filter(m => m.tipo === 'ingreso').reduce((s,m) => s + m.cantidad, 0);
+    const gastos = movs.filter(m => m.tipo === 'gasto').reduce((s,m) => s + m.cantidad, 0);
+    const balance = ingresos - gastos;
+    const balClass = balance > 0 ? 'pos' : balance < 0 ? 'neg' : '';
+    document.getElementById('finanzas-summary').innerHTML =
+      `Ingresos: $${ingresos.toFixed(2)} · Gastos: $${gastos.toFixed(2)} · Balance: <span class="${balClass}">$${balance.toFixed(2)}</span>`;
   }
 
   function colorForPct(pct){
@@ -559,7 +763,17 @@
           const hasData = Object.keys(dayObj).length > 0;
           const pct = score / 16;
           cell.style.background = hasData ? colorForPct(pct) : '#EFE6D6';
-          cell.title = `${iso} · ${score}/16`;
+
+          const balance = finanzasBalance(iso);
+          if (balance > 0){
+            cell.style.boxShadow = 'inset 0 0 0 2px #3F6B4F';
+          } else if (balance < 0){
+            cell.style.boxShadow = 'inset 0 0 0 2px #B5624A';
+          }
+
+          cell.title = balance !== 0
+            ? `${iso} · ${score}/16 · Balance: $${balance.toFixed(2)}`
+            : `${iso} · ${score}/16`;
           if (hasData){
             totalPct += pct;
             totalDaysWithData++;
@@ -629,12 +843,39 @@
     renderAllWeekly();
     renderHeatmap();
   });
+  document.getElementById('lectura-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.lectura = !dayObj.lectura;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
+
+  document.getElementById('input-libro').addEventListener('change', (e) => {
+    saveLibro(selectedISO, e.target.value);
+  });
+
+  document.getElementById('fin-add').addEventListener('click', () => {
+    const tipo = document.getElementById('fin-tipo').value;
+    const cantidad = parseFloat(document.getElementById('fin-cantidad').value);
+    const categoria = document.getElementById('fin-categoria').value.trim();
+    if (!cantidad || cantidad <= 0) return;
+    const current = getFinanzas(selectedISO);
+    current.push({ tipo, cantidad, categoria });
+    saveFinanzas(selectedISO, current);
+    document.getElementById('fin-cantidad').value = '';
+    document.getElementById('fin-categoria').value = '';
+    renderFinanzas();
+    renderHeatmap();
+  });
 
   document.getElementById('input-date').addEventListener('change', (e) => {
     selectedISO = e.target.value;
     renderHydration();
     renderChecklist();
     renderAllWeekly();
+    renderLibro();
+    renderFinanzas();
   });
 
   (function init(){
@@ -642,6 +883,8 @@
     renderHydration();
     renderChecklist();
     renderAllWeekly();
+    renderLibro();
+    renderFinanzas();
     renderHeatmap();
   })();
 </script>
