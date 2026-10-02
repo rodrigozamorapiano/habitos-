@@ -15,8 +15,9 @@
     --cream-alt:  #EFE6D6;
     --ink:        #2B271F;
     --ink-soft:   #7A7264;
-    --forest:     #3F6B4F;
-    --forest-dim: #7FA688;
+    --forest:     #34C759;
+    --forest-dim: #86E8A0;
+    --forest-light: #4CD964;
     --clay:       #B5624A;
     --plum:       #7A5C7E;
     --ochre:      #C79A3D;
@@ -286,7 +287,7 @@
   .finanzas-form input[type="number"]{ width: 110px; }
   .finanzas-form input[type="text"]{ flex: 1; min-width: 130px; }
   .fin-add-btn{
-    background: var(--forest);
+    background: var(--forest-light);
     border: none;
     color: var(--white);
     font-family: 'Inter', sans-serif;
@@ -502,7 +503,7 @@
     </div>
 
     <div class="ring-legend">
-      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #3F6B4F;"></div>
+      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #34C759;"></div>
       <span>Ingresos &gt; gastos</span>
       <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #B5624A;"></div>
       <span>Gastos &gt; ingresos</span>
@@ -720,8 +721,8 @@
     const svg = document.getElementById('fin-chart');
     const caption = document.getElementById('fin-chart-caption');
 
-    const VERDE = '#3F6B4F';
-    const ROJO  = '#B5624A';
+    const VERDE = '#4CD964';
+    const ROJO  = '#FF3B30';
     const NEUTRO = '#DDD2BE';
     const R = 70;      // radio fijo del círculo principal
     const CX = 80, CY = 80;
@@ -841,7 +842,7 @@
 
           const balance = finanzasBalance(iso);
           if (balance > 0){
-            cell.style.boxShadow = 'inset 0 0 0 2px #3F6B4F';
+            cell.style.boxShadow = 'inset 0 0 0 2px #34C759';
           } else if (balance < 0){
             cell.style.boxShadow = 'inset 0 0 0 2px #B5624A';
           }
