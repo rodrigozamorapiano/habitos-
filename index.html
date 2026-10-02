@@ -254,6 +254,19 @@
   .libro-row input[type="text"]:focus{ outline: none; border-color: var(--teal); }
 
   /* ---- registro de cuentas ---- */
+  .fin-chart-wrap{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .fin-chart-caption{
+    font-size: 12px;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
   .finanzas-form{
     display: flex;
     gap: 10px;
@@ -447,6 +460,11 @@
   <div class="panel">
     <div class="panel-title">Registro de cuentas, ingreso y gasto</div>
     <div class="panel-sub">Agrega los movimientos de este día</div>
+
+    <div class="fin-chart-wrap">
+      <svg id="fin-chart" width="160" height="160" viewBox="0 0 160 160"></svg>
+      <div class="fin-chart-caption" id="fin-chart-caption">—</div>
+    </div>
 
     <div class="finanzas-form">
       <select id="fin-tipo">
@@ -677,6 +695,61 @@
     return getFinanzas(iso).reduce((sum, m) => sum + (m.tipo === 'ingreso' ? m.cantidad : -m.cantidad), 0);
   }
 
+  const DAY_KEY_RE = /^habitos:\d{4}-\d{2}-\d{2}$/;
+
+  // Suma ingresos y gastos de TODOS los días guardados (acumulado total, no semanal).
+  function getFinanzasAcumuladoTotal(){
+    let ingresos = 0, gastos = 0;
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (DAY_KEY_RE.test(k)){
+        const dayObj = getDay(k.slice('habitos:'.length));
+        const movs = Array.isArray(dayObj.finanzas) ? dayObj.finanzas : [];
+        movs.forEach(m => {
+          const cant = Number(m.cantidad) || 0;
+          if (m.tipo === 'ingreso') ingresos += cant;
+          else gastos += cant;
+        });
+      }
+    }
+    return { ingresos, gastos };
+  }
+
+  function renderFinanzasChart(){
+    const { ingresos, gastos } = getFinanzasAcumuladoTotal();
+    const svg = document.getElementById('fin-chart');
+    const caption = document.getElementById('fin-chart-caption');
+
+    const VERDE = '#3F6B4F';
+    const ROJO  = '#B5624A';
+    const NEUTRO = '#DDD2BE';
+    const R = 70;      // radio fijo del círculo principal
+    const CX = 80, CY = 80;
+
+    const mayor = Math.max(ingresos, gastos);
+    const menor = Math.min(ingresos, gastos);
+
+    let colorPrincipal, colorAnillo = null, rAnillo = 0;
+    if (mayor <= 0){
+      colorPrincipal = NEUTRO;
+    } else {
+      const ganaIngreso = ingresos >= gastos;
+      colorPrincipal = ganaIngreso ? VERDE : ROJO;
+      colorAnillo = ganaIngreso ? ROJO : VERDE;
+      rAnillo = R * (menor / mayor);
+    }
+
+    let svgContent = `<circle cx="${CX}" cy="${CY}" r="${R}" fill="${colorPrincipal}"></circle>`;
+    if (colorAnillo){
+      svgContent += `<circle cx="${CX}" cy="${CY}" r="${Math.max(rAnillo, 2)}" fill="none" stroke="${colorAnillo}" stroke-width="3"></circle>`;
+    }
+    svg.innerHTML = svgContent;
+
+    caption.textContent = mayor <= 0
+      ? 'Aún no hay movimientos registrados.'
+      : `Acumulado total — Ingresos: $${ingresos.toFixed(2)} · Gastos: $${gastos.toFixed(2)}`;
+  }
+
   function renderFinanzas(){
     const movs = getFinanzas(selectedISO);
     const list = document.getElementById('finanzas-list');
@@ -711,6 +784,8 @@
     const balClass = balance > 0 ? 'pos' : balance < 0 ? 'neg' : '';
     document.getElementById('finanzas-summary').innerHTML =
       `Ingresos: $${ingresos.toFixed(2)} · Gastos: $${gastos.toFixed(2)} · Balance: <span class="${balClass}">$${balance.toFixed(2)}</span>`;
+
+    renderFinanzasChart();
   }
 
   function colorForPct(pct){
