@@ -2,59 +2,66 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>index</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>Hábitos</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root{
-    --cream:      #F7F2E9;
-    --cream-alt:  #EFE6D6;
-    --ink:        #2B271F;
-    --ink-soft:   #7A7264;
-    --forest:     #34C759;
-    --forest-dim: #86E8A0;
-    --forest-light: #4CD964;
-    --clay:       #B5624A;
-    --plum:       #7A5C7E;
-    --ochre:      #C79A3D;
-    --slate:      #5C7A8A;
-    --teal:       #3F7C7A;
-    --line:       #E1D6C1;
-    --white:      #FFFDF8;
+    /* paleta oscura: los nombres se conservan, los valores cambian */
+    --cream:      #000000;
+    --cream-alt:  #1a1a1f;
+    --ink:        #f4f4f5;
+    --ink-soft:   #8a8a93;
+    --forest:     #00e08a;
+    --forest-dim: #0f6b45;
+    --forest-light: #00e08a;
+    --clay:       #ff4d6a;
+    --plum:       #8b7cff;
+    --ochre:      #ffb020;
+    --slate:      #38bdf8;
+    --teal:       #2dd4bf;
+    --line:       #25252b;
+    --white:      #0d0d0f;
+    color-scheme: dark;
   }
 
   body{
     background: var(--cream);
     color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     min-height: 100vh;
-    padding: 44px 20px 90px;
+    padding: calc(24px + env(safe-area-inset-top, 0px)) 16px calc(90px + env(safe-area-inset-bottom, 0px));
   }
 
   .wrap{ max-width: 920px; margin: 0 auto; }
 
+  .banner{
+    background: radial-gradient(circle at 90% -20%, rgba(0,224,138,.28), transparent 55%),
+                radial-gradient(circle at 0% 120%, rgba(139,124,255,.22), transparent 55%), #0a0a0c;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 20px 18px;
+    margin-bottom: 22px;
+  }
+  .banner p{ color: var(--ink-soft); font-size: 14px; margin-top: 4px; }
   h1{
-    font-family: 'Fraunces', serif;
-    font-weight: 600;
-    font-style: italic;
-    font-size: clamp(30px, 5vw, 42px);
-    margin-bottom: 36px;
+    font-weight: 700;
+    font-size: clamp(26px, 5vw, 34px);
+    letter-spacing: -.02em;
   }
 
   .panel{
     background: var(--white);
     border: 1px solid var(--line);
-    border-radius: 10px;
-    padding: 26px;
+    border-radius: 16px;
+    padding: 22px;
     margin-bottom: 22px;
   }
 
   .panel-title{
-    font-family: 'Fraunces', serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
     font-size: 19px;
     margin-bottom: 4px;
@@ -75,12 +82,12 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-size: 13px;
     padding: 8px 10px;
   }
   .day-score{
-    font-family: 'Fraunces', serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
     font-size: 18px;
     color: var(--forest);
@@ -129,12 +136,12 @@
     line-height: 1;
   }
   .hydration.complete .hyd-btn{ border-color: var(--white); color: var(--white); }
-  .hyd-count{ font-family: 'Fraunces', serif; font-weight: 600; font-size: 15px; min-width: 42px; text-align: center; }
+  .hyd-count{ font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-weight: 600; font-size: 15px; min-width: 42px; text-align: center; }
 
   /* ---- checklist ---- */
   .habit-grid{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
     gap: 10px;
   }
   .habit{
@@ -248,7 +255,7 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-size: 13px;
     padding: 8px 10px;
   }
@@ -280,7 +287,7 @@
     border: 1px solid var(--line);
     border-radius: 6px;
     color: var(--ink);
-    font-family: 'Inter', sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-size: 13px;
     padding: 8px 10px;
   }
@@ -290,7 +297,7 @@
     background: var(--forest-light);
     border: none;
     color: var(--white);
-    font-family: 'Inter', sans-serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-size: 13px;
     font-weight: 500;
     padding: 8px 18px;
@@ -331,7 +338,7 @@
   .fin-empty{ font-size: 13px; color: var(--ink-soft); opacity: 0.7; font-style: italic; margin-bottom: 16px; }
 
   .finanzas-summary{
-    font-family: 'Fraunces', serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
     font-size: 15px;
   }
@@ -383,7 +390,7 @@
     flex-wrap: wrap;
   }
   .year-stat .n{
-    font-family: 'Fraunces', serif;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     font-weight: 600;
     font-size: 24px;
     color: var(--forest);
@@ -394,7 +401,10 @@
 <body>
 <div class="wrap">
 
-  <h1>Hábitos</h1>
+  <div class="banner">
+    <h1>Hábitos</h1>
+    <p>Constancia diaria, un día a la vez.</p>
+  </div>
 
   <div class="panel">
     <div class="panel-title">Hoy</div>
@@ -402,7 +412,7 @@
 
     <div class="date-row">
       <input type="date" id="input-date">
-      <div class="day-score" id="day-score">0 / 16</div>
+      <div class="day-score" id="day-score">0 / 17</div>
     </div>
 
     <div class="hydration" id="hydration-block">
@@ -494,24 +504,24 @@
 
     <div class="heatmap-legend">
       <span>Menos</span>
-      <div class="heat-cell" style="background:#EFE6D6"></div>
-      <div class="heat-cell" style="background:#C94C42"></div>
-      <div class="heat-cell" style="background:#D6B54D"></div>
-      <div class="heat-cell" style="background:#9CB557"></div>
-      <div class="heat-cell" style="background:#5A945C"></div>
+      <div class="heat-cell" style="background:#1a1a1f"></div>
+      <div class="heat-cell" style="background:#ff4d6a"></div>
+      <div class="heat-cell" style="background:#ffb020"></div>
+      <div class="heat-cell" style="background:#a3e635"></div>
+      <div class="heat-cell" style="background:#00e08a"></div>
       <span>Más</span>
     </div>
 
     <div class="ring-legend">
-      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #34C759;"></div>
+      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #00e08a;"></div>
       <span>Ingresos &gt; gastos</span>
-      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #B5624A;"></div>
+      <div class="ring-swatch" style="box-shadow: inset 0 0 0 2px #ff4d6a;"></div>
       <span>Gastos &gt; ingresos</span>
     </div>
 
     <div class="year-stats">
       <div class="year-stat"><div class="n" id="stat-avg">0%</div><div class="l">Promedio del año</div></div>
-      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l">Días perfectos (16/16)</div></div>
+      <div class="year-stat"><div class="n" id="stat-perfect">0</div><div class="l" id="stat-perfect-label">Días perfectos</div></div>
       <div class="year-stat"><div class="n" id="stat-streak">0</div><div class="l">Racha actual</div></div>
     </div>
   </div>
@@ -528,15 +538,17 @@
     { key: 'social', label: 'Socializar' },
     { key: 'disciplina', label: 'Disciplina' },
     { key: 'respiracion', label: 'Respirar con profundidad' },
-    { key: 'dormir', label: 'Dormir 8 horas' },
+    { key: 'dormir', label: 'Dormir 8 horas y café antes de las 2 pm' },
     { key: 'limpieza', label: 'Limpieza del entorno' },
     { key: 'estudio', label: 'Estudio' },
     { key: 'autoconocimiento', label: 'Autoconocimiento' },
+    { key: 'serenidad', label: 'No quejarse, no enojarse y no criticar' },
     { key: 'feliz', label: 'Ser feliz' },
     { key: 'brilliant', label: 'Brilliant (lección de matemáticas)' },
     { key: 'redes', label: 'Redes sociales solo 9:00 pm (10 min)' }
   ];
   const HYDRATION_TARGET = 9;
+  const TOTAL = HABITS.length + 1; // hábitos + hidratación completa
   const WEEKLY = [
     { key: 'ejercicio', target: 3 },
     { key: 'minoxidil', target: 5 },
@@ -562,7 +574,7 @@
     localStorage.setItem(`habitos:${iso}`, JSON.stringify(obj));
   }
 
-  // score diario sobre 8: los 7 hábitos booleanos + hidratación completa (10/10)
+  // score diario sobre TOTAL: hábitos booleanos + hidratación completa
   function dailyScore(dayObj){
     const boolScore = HABITS.filter(h => dayObj[h.key]).length;
     const hydOk = (dayObj.hidratacion || 0) >= HYDRATION_TARGET ? 1 : 0;
@@ -601,7 +613,7 @@
 
   function renderDayScore(){
     const dayObj = getDay(selectedISO);
-    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / 16`;
+    document.getElementById('day-score').textContent = `${dailyScore(dayObj)} / ${TOTAL}`;
     const d = fromISO(selectedISO);
     document.getElementById('date-display').textContent =
       d.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -721,9 +733,9 @@
     const svg = document.getElementById('fin-chart');
     const caption = document.getElementById('fin-chart-caption');
 
-    const VERDE = '#4CD964';
-    const ROJO  = '#FF3B30';
-    const NEUTRO = '#DDD2BE';
+    const VERDE = '#00e08a';
+    const ROJO  = '#ff4d6a';
+    const NEUTRO = '#2a2a31';
     const R = 70;      // radio fijo del círculo principal
     const CX = 80, CY = 80;
 
@@ -790,13 +802,13 @@
   }
 
   function colorForPct(pct){
-    if (pct <= 0) return '#EFE6D6';
+    if (pct <= 0) return '#1a1a1f';
     const stops = [
-      [201, 76, 66],   // rojo   (pocos hábitos)
-      [214, 138, 65],  // naranja
-      [214, 181, 77],  // amarillo
-      [156, 181, 87],  // amarillo-verde
-      [90, 148, 92]    // verde  (casi todos/todos)
+      [255, 77, 106],  // rojo   (pocos hábitos)
+      [255, 140, 66],  // naranja
+      [255, 176, 32],  // amarillo
+      [163, 230, 53],  // lima
+      [0, 224, 138]    // verde  (casi todos/todos)
     ];
     const scaled = pct * (stops.length - 1);
     const idx = Math.min(Math.floor(scaled), stops.length - 2);
@@ -807,7 +819,7 @@
 
   function renderHeatmap(){
     const year = new Date().getFullYear();
-    document.getElementById('year-label').textContent = `${year} · consistencia diaria (16 hábitos)`;
+    document.getElementById('year-label').textContent = `${year} · consistencia diaria (${TOTAL} hábitos)`;
 
     const jan1 = new Date(year, 0, 1);
     const dec31 = new Date(year, 11, 31);
@@ -837,23 +849,23 @@
           const dayObj = getDay(iso);
           const score = dailyScore(dayObj);
           const hasData = Object.keys(dayObj).length > 0;
-          const pct = score / 16;
-          cell.style.background = hasData ? colorForPct(pct) : '#EFE6D6';
+          const pct = score / TOTAL;
+          cell.style.background = hasData ? colorForPct(pct) : '#1a1a1f';
 
           const balance = finanzasBalance(iso);
           if (balance > 0){
-            cell.style.boxShadow = 'inset 0 0 0 2px #34C759';
+            cell.style.boxShadow = 'inset 0 0 0 2px #00e08a';
           } else if (balance < 0){
-            cell.style.boxShadow = 'inset 0 0 0 2px #B5624A';
+            cell.style.boxShadow = 'inset 0 0 0 2px #ff4d6a';
           }
 
           cell.title = balance !== 0
-            ? `${iso} · ${score}/16 · Balance: $${balance.toFixed(2)}`
-            : `${iso} · ${score}/16`;
+            ? `${iso} · ${score}/${TOTAL} · Balance: $${balance.toFixed(2)}`
+            : `${iso} · ${score}/${TOTAL}`;
           if (hasData){
             totalPct += pct;
             totalDaysWithData++;
-            if (score === 16) perfectDays++;
+            if (score === TOTAL) perfectDays++;
           }
         } else {
           cell.style.opacity = '0';
@@ -876,7 +888,7 @@
     let d = fromISO(todayISO());
     while (true){
       const dayObj = getDay(toISO(d));
-      if (dailyScore(dayObj) >= 12){ // ~75% de 16
+      if (dailyScore(dayObj) >= Math.ceil(TOTAL * 0.75)){ // ~75% del total
         currentStreak++;
         d.setDate(d.getDate() - 1);
       } else break;
@@ -885,6 +897,7 @@
     document.getElementById('stat-avg').textContent =
       totalDaysWithData > 0 ? `${Math.round((totalPct/totalDaysWithData)*100)}%` : '0%';
     document.getElementById('stat-perfect').textContent = perfectDays;
+    document.getElementById('stat-perfect-label').textContent = `Días perfectos (${TOTAL}/${TOTAL})`;
     document.getElementById('stat-streak').textContent = currentStreak;
   }
 
