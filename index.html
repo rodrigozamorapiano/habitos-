@@ -412,7 +412,7 @@
 
     <div class="date-row">
       <input type="date" id="input-date">
-      <div class="day-score" id="day-score">0 / 17</div>
+      <div class="day-score" id="day-score">0 / 11</div>
     </div>
 
     <div class="hydration" id="hydration-block">
@@ -529,23 +529,19 @@
 </div>
 
 <script>
+  // Los hábitos fusionados usan una clave nueva. "legacy" son las claves antiguas que los forman:
+  // los días ya guardados cuentan como hechos si tenían marcadas todas esas claves.
   const HABITS = [
-    { key: 'sol', label: 'Tomar el sol' },
-    { key: 'aguafria', label: 'Agua fría' },
-    { key: 'comer', label: 'Comer sano' },
-    { key: 'caminar', label: 'Caminar' },
-    { key: 'higiene', label: 'Higiene' },
+    { key: 'sol_agua_higiene', label: 'Tomar el sol, agua fría e higiene', legacy: ['sol', 'aguafria', 'higiene'] },
+    { key: 'comer_respirar', label: 'Comer sano (verduras 3 veces) y respirar con profundidad', legacy: ['comer', 'respiracion'] },
+    { key: 'caminar', label: 'Caminar 5,000 pasos' },
     { key: 'social', label: 'Socializar' },
     { key: 'disciplina', label: 'Disciplina' },
-    { key: 'respiracion', label: 'Respirar con profundidad' },
-    { key: 'dormir', label: 'Dormir 8 horas y café antes de las 2 pm' },
+    { key: 'dormir_redes', label: 'Dormir 8 horas, café antes de las 2 pm y redes sociales solo 10 min a las 9:00 pm', legacy: ['dormir', 'redes'] },
     { key: 'limpieza', label: 'Limpieza del entorno' },
-    { key: 'estudio', label: 'Estudio' },
-    { key: 'autoconocimiento', label: 'Autoconocimiento' },
+    { key: 'estudio_auto', label: 'Estudio (cultura o matemáticas) y autoconocimiento', legacy: ['estudio', 'autoconocimiento'] },
     { key: 'serenidad', label: 'No quejarse, no enojarse y no criticar' },
-    { key: 'feliz', label: 'Ser feliz' },
-    { key: 'brilliant', label: 'Brilliant (2 lecciones de matemáticas)' },
-    { key: 'redes', label: 'Redes sociales solo 9:00 pm (10 min)' }
+    { key: 'feliz', label: 'Ser feliz' }
   ];
   const HYDRATION_TARGET = 9;
   const TOTAL = HABITS.length + 1; // hábitos + hidratación completa
@@ -574,9 +570,14 @@
     localStorage.setItem(`habitos:${iso}`, JSON.stringify(obj));
   }
 
+  function habitDone(dayObj, h){
+    if (h.key in dayObj) return !!dayObj[h.key];
+    return h.legacy ? h.legacy.every(k => dayObj[k]) : false;
+  }
+
   // score diario sobre TOTAL: hábitos booleanos + hidratación completa
   function dailyScore(dayObj){
-    const boolScore = HABITS.filter(h => dayObj[h.key]).length;
+    const boolScore = HABITS.filter(h => habitDone(dayObj, h)).length;
     const hydOk = (dayObj.hidratacion || 0) >= HYDRATION_TARGET ? 1 : 0;
     return boolScore + hydOk;
   }
@@ -626,11 +627,11 @@
 
     HABITS.forEach(h => {
       const el = document.createElement('div');
-      el.className = 'habit' + (dayObj[h.key] ? ' checked' : '');
+      el.className = 'habit' + (habitDone(dayObj, h) ? ' checked' : '');
       el.innerHTML = `<div class="habit-box"></div><span class="habit-label">${h.label}</span>`;
       el.addEventListener('click', () => {
         const current = getDay(selectedISO);
-        current[h.key] = !current[h.key];
+        current[h.key] = !habitDone(current, h);
         saveDay(selectedISO, current);
         renderChecklist();
         renderDayScore();
