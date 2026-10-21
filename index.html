@@ -22,6 +22,7 @@
     --ochre:      #ffb020;
     --slate:      #38bdf8;
     --teal:       #2dd4bf;
+    --pink:       #f472b6;
     --line:       #25252b;
     --white:      #0d0d0f;
     color-scheme: dark;
@@ -193,11 +194,12 @@
   /* ---- metas semanales (ejercicio / minoxidil) ---- */
   .weekly-goals{
     display: flex;
-    gap: 28px;
+    gap: 18px 28px;
     margin-top: 18px;
     padding-top: 18px;
     border-top: 1px solid var(--line);
     flex-wrap: wrap;
+    align-items: flex-start;
   }
   .weekly-goal{ display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-soft); }
   .weekly-goal .dots{ display: flex; gap: 5px; }
@@ -217,6 +219,9 @@
   .weekly-goal.lectura .dot{ border: 1.5px solid var(--teal); }
   .weekly-goal.lectura .dot.on{ background: var(--teal); }
   .weekly-goal.lectura b{ color: var(--teal); font-weight: 600; }
+  .weekly-goal.pendiente .dot{ border: 1.5px solid var(--pink); }
+  .weekly-goal.pendiente .dot.on{ background: var(--pink); }
+  .weekly-goal.pendiente b{ color: var(--pink); font-weight: 600; }
 
   .toggle-chip{
     display: inline-flex;
@@ -238,19 +243,14 @@
   .weekly-goal.calzado .toggle-chip.active{ background: var(--slate); color: var(--white); }
   .weekly-goal.lectura .toggle-chip{ border: 1px solid var(--teal); color: var(--teal); }
   .weekly-goal.lectura .toggle-chip.active{ background: var(--teal); color: var(--white); }
+  .weekly-goal.pendiente .toggle-chip{ border: 1px solid var(--pink); color: var(--pink); }
+  .weekly-goal.pendiente .toggle-chip.active{ background: var(--pink); color: var(--white); }
 
-  /* ---- libro en turno ---- */
-  .libro-row{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-  .libro-row label{ font-size: 13px; color: var(--ink-soft); }
-  .libro-row input[type="text"]{
-    flex: 1;
-    min-width: 180px;
+  /* ---- campo de texto semanal, debajo de su meta (libro en turno, pendiente) ---- */
+  .goal-line{ display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .weekly-goal.con-texto{ flex: 1 1 260px; flex-direction: column; align-items: stretch; gap: 8px; }
+  .week-input{
+    width: 100%;
     background: var(--cream);
     border: 1px solid var(--line);
     border-radius: 6px;
@@ -259,7 +259,9 @@
     font-size: 13px;
     padding: 8px 10px;
   }
-  .libro-row input[type="text"]:focus{ outline: none; border-color: var(--teal); }
+  .week-input:focus{ outline: none; }
+  .weekly-goal.lectura .week-input:focus{ border-color: var(--teal); }
+  .weekly-goal.pendiente .week-input:focus{ border-color: var(--pink); }
 
   /* ---- registro de cuentas ---- */
   .fin-chart-wrap{
@@ -422,7 +424,7 @@
       </div>
       <div class="hyd-controls">
         <button class="hyd-btn" id="hyd-minus">−</button>
-        <div class="hyd-count" id="hyd-count">0/10</div>
+        <div class="hyd-count" id="hyd-count">0/8</div>
         <button class="hyd-btn" id="hyd-plus">+</button>
       </div>
     </div>
@@ -454,17 +456,24 @@
         <b id="calzado-count">0/1</b>
         <span class="toggle-chip" id="calzado-toggle">marcar hoy</span>
       </div>
-      <div class="weekly-goal lectura">
-        <span>Lectura de libro:</span>
-        <div class="dots" id="lectura-dots"></div>
-        <b id="lectura-count">0/1</b>
-        <span class="toggle-chip" id="lectura-toggle">marcar hoy</span>
+      <div class="weekly-goal lectura con-texto">
+        <div class="goal-line">
+          <span>Lectura de libro:</span>
+          <div class="dots" id="lectura-dots"></div>
+          <b id="lectura-count">0/1</b>
+          <span class="toggle-chip" id="lectura-toggle">marcar hoy</span>
+        </div>
+        <input class="week-input" type="text" id="input-libro" placeholder="Libro en turno esta semana..." aria-label="Libro en turno esta semana">
       </div>
-    </div>
-
-    <div class="libro-row">
-      <label for="input-libro">Libro en turno esta semana:</label>
-      <input type="text" id="input-libro" placeholder="Título del libro...">
+      <div class="weekly-goal pendiente con-texto">
+        <div class="goal-line">
+          <span>Pendiente a resolver:</span>
+          <div class="dots" id="pendiente-dots"></div>
+          <b id="pendiente-count">0/1</b>
+          <span class="toggle-chip" id="pendiente-toggle">marcar hoy</span>
+        </div>
+        <input class="week-input" type="text" id="input-pendiente" placeholder="Pendiente a resolver esta semana..." aria-label="Pendiente a resolver esta semana">
+      </div>
     </div>
   </div>
 
@@ -542,14 +551,15 @@
     { key: 'serenidad', label: 'No quejarse, no enojarse y no criticar' },
     { key: 'feliz', label: 'Ser feliz' }
   ];
-  const HYDRATION_TARGET = 9;
+  const HYDRATION_TARGET = 8;
   const TOTAL = HABITS.length + 1; // hábitos + hidratación completa
   const WEEKLY = [
     { key: 'ejercicio', target: 3 },
     { key: 'minoxidil', target: 5 },
     { key: 'crecimiento', target: 1 },
     { key: 'calzado', target: 1 },
-    { key: 'lectura', target: 1 }
+    { key: 'lectura', target: 1 },
+    { key: 'pendiente', target: 1 }
   ];
 
   const MESES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
@@ -585,7 +595,7 @@
 
   function renderHydration(){
     const dayObj = getDay(selectedISO);
-    const count = dayObj.hidratacion || 0;
+    const count = Math.min(dayObj.hidratacion || 0, HYDRATION_TARGET);   // días guardados con más vasos no muestran 9/8
     const block = document.getElementById('hydration-block');
     block.classList.toggle('complete', count >= HYDRATION_TARGET);
 
@@ -680,18 +690,20 @@
     renderWeekly('crecimiento', 1, 'crecimiento-dots', 'crecimiento-count', 'crecimiento-toggle');
     renderWeekly('calzado', 1, 'calzado-dots', 'calzado-count', 'calzado-toggle');
     renderWeekly('lectura', 1, 'lectura-dots', 'lectura-count', 'lectura-toggle');
+    renderWeekly('pendiente', 1, 'pendiente-dots', 'pendiente-count', 'pendiente-toggle');
   }
 
-  // ---- libro en turno (por semana) ----
-  function getLibro(iso){
-    try{ return localStorage.getItem(`libro:${toISO(weekMondayFor(iso))}`) || ''; }
+  // ---- textos por semana: libro en turno y pendiente a resolver ----
+  function getWeekText(name, iso){
+    try{ return localStorage.getItem(`${name}:${toISO(weekMondayFor(iso))}`) || ''; }
     catch(e){ return ''; }
   }
-  function saveLibro(iso, text){
-    localStorage.setItem(`libro:${toISO(weekMondayFor(iso))}`, text);
+  function saveWeekText(name, iso, text){
+    localStorage.setItem(`${name}:${toISO(weekMondayFor(iso))}`, text);
   }
-  function renderLibro(){
-    document.getElementById('input-libro').value = getLibro(selectedISO);
+  function renderWeekTexts(){
+    document.getElementById('input-libro').value = getWeekText('libro', selectedISO);
+    document.getElementById('input-pendiente').value = getWeekText('pendiente', selectedISO);
   }
 
   // ---- registro de cuentas (ingreso / gasto) ----
@@ -939,9 +951,19 @@
     renderAllWeekly();
     renderHeatmap();
   });
+  document.getElementById('pendiente-toggle').addEventListener('click', () => {
+    const dayObj = getDay(selectedISO);
+    dayObj.pendiente = !dayObj.pendiente;
+    saveDay(selectedISO, dayObj);
+    renderAllWeekly();
+    renderHeatmap();
+  });
 
   document.getElementById('input-libro').addEventListener('change', (e) => {
-    saveLibro(selectedISO, e.target.value);
+    saveWeekText('libro', selectedISO, e.target.value);
+  });
+  document.getElementById('input-pendiente').addEventListener('input', (e) => {
+    saveWeekText('pendiente', selectedISO, e.target.value);
   });
 
   document.getElementById('fin-add').addEventListener('click', () => {
@@ -963,7 +985,7 @@
     renderHydration();
     renderChecklist();
     renderAllWeekly();
-    renderLibro();
+    renderWeekTexts();
     renderFinanzas();
   });
 
@@ -972,7 +994,7 @@
     renderHydration();
     renderChecklist();
     renderAllWeekly();
-    renderLibro();
+    renderWeekTexts();
     renderFinanzas();
     renderHeatmap();
   })();
