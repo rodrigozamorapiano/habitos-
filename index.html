@@ -398,6 +398,25 @@
     color: var(--forest);
   }
   .year-stat .l{ font-size: 12px; color: var(--ink-soft); }
+
+  /* ---- datos: exportar, importar y borrar ---- */
+  .data-row{ display: flex; gap: 10px; flex-wrap: wrap; }
+  .data-btn{
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .data-btn:hover{ border-color: var(--forest-dim); }
+  .data-btn.main{ background: var(--forest); border-color: var(--forest); color: var(--white); }
+  .data-btn.danger{ color: var(--clay); border-color: var(--clay); }
+  .data-btn.danger:hover{ background: var(--clay); color: var(--white); }
+  .data-msg{ font-size: 12.5px; color: var(--ink-soft); margin-top: 14px; line-height: 1.5; }
 </style>
 </head>
 <body>
@@ -535,6 +554,18 @@
     </div>
   </div>
 
+  <div class="panel">
+    <div class="panel-title">Datos</div>
+    <div class="panel-sub">Guarda una copia en tu dispositivo o cárgala en otro</div>
+    <div class="data-row">
+      <button class="data-btn main" id="data-export">Exportar datos</button>
+      <button class="data-btn" id="data-import">Importar datos</button>
+      <input type="file" id="data-file" accept="application/json,.json" hidden>
+      <button class="data-btn danger" id="data-clear">Borrar todo</button>
+    </div>
+    <p class="data-msg" id="data-msg" role="status">Exportar descarga un archivo con tus hábitos, cuentas y textos de la semana. Importar suma lo del archivo a lo que ya tienes; no borra nada. Borrar todo elimina lo guardado en este navegador, así que exporta antes.</p>
+  </div>
+
 </div>
 
 <script>
@@ -568,6 +599,10 @@
   function toISO(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
   function fromISO(iso){ const [y,m,d] = iso.split('-').map(Number); return new Date(y, m-1, d); }
   function todayISO(){ return toISO(new Date()); }
+
+  function escapeHtml(text){
+    return String(text == null ? '' : text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
 
   function getDay(iso){
     try{
@@ -788,7 +823,7 @@
       movs.forEach((m, i) => {
         const el = document.createElement('div');
         el.className = `fin-item ${m.tipo}`;
-        el.innerHTML = `<span>${m.tipo === 'ingreso' ? '↑' : '↓'} <span class="fin-amount">$${m.cantidad.toFixed(2)}</span> · ${m.categoria || 'Sin categoría'}</span><span class="fin-del" data-idx="${i}">×</span>`;
+        el.innerHTML = `<span>${m.tipo === 'ingreso' ? '↑' : '↓'} <span class="fin-amount">$${m.cantidad.toFixed(2)}</span> · ${escapeHtml(m.categoria) || 'Sin categoría'}</span><span class="fin-del" data-idx="${i}">×</span>`;
         list.appendChild(el);
       });
       list.querySelectorAll('.fin-del').forEach(btn => {
@@ -988,6 +1023,166 @@
     renderWeekTexts();
     renderFinanzas();
   });
+
+  // ---- datos: exportar, importar y borrar todo ----
+  const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
+  const APP_KEY_RE = /^(habitos|libro|pendiente):\d{4}-\d{2}-\d{2}$/;
+  const TEXT_NAMES = ['libro', 'pendiente'];
+  const dataMsg = text => { document.getElementById('data-msg').textContent = text; };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  function appKeys(){   // solo las claves de esta app; nada más del navegador
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (APP_KEY_RE.test(k)) keys.push(k);
+    }
+    return keys;
+  }
+
+  function refreshAll(){
+    renderHydration();
+    renderChecklist();
+    renderAllWeekly();
+    renderWeekTexts();
+    renderFinanzas();
+    renderHeatmap();
+  }
+
+  function exportData(){
+    const dias = {}, textos = { libro: {}, pendiente: {} };
+    appKeys().forEach(k => {
+      const [name, iso] = k.split(':');
+      if (name === 'habitos') dias[iso] = getDay(iso);
+      else { const t = localStorage.getItem(k); if (t) textos[name][iso] = t; }
+    });
+    const data = { app: 'habitos', version: 1, exportado: new Date().toISOString(), dias, textos };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `habitos-datos-${todayISO()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    dataMsg(`Listo: se guardó ${link.download} (${plural(Object.keys(dias).length, 'día', 'días')}). Búscalo en tus descargas.`);
+  }
+
+  // Deja solo lo que la app entiende: hábitos marcados (sí/no), números y movimientos válidos
+  function cleanDay(raw){
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+    const out = {};
+    Object.keys(raw).forEach(k => {
+      const v = raw[k];
+      if (k === 'finanzas'){
+        if (!Array.isArray(v)) return;
+        out.finanzas = v.map(m => {
+          const cantidad = Number(m && m.cantidad);
+          if (!m || (m.tipo !== 'ingreso' && m.tipo !== 'gasto') || !Number.isFinite(cantidad) || cantidad <= 0 || cantidad > 1e9) return null;
+          return { tipo: m.tipo, cantidad, categoria: typeof m.categoria === 'string' ? m.categoria.slice(0, 60) : '' };
+        }).filter(Boolean);
+      } else if (/^[a-z_]{1,40}$/i.test(k)){
+        if (typeof v === 'boolean') out[k] = v;
+        else if (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1000000) out[k] = v;
+      }
+    });
+    return out;
+  }
+
+  // Suma el día importado al que ya existe: lo marcado se conserva, gana el número mayor y los movimientos no se duplican
+  function mergeDay(local, incoming){
+    const merged = Object.assign({}, local);
+    let changed = false;
+    Object.keys(incoming).forEach(k => {
+      const v = incoming[k];
+      if (k === 'finanzas'){
+        const mine = Array.isArray(merged.finanzas) ? merged.finanzas.slice() : [];
+        const sig = m => `${m.tipo}|${m.cantidad}|${m.categoria || ''}`;
+        const pool = {};
+        mine.forEach(m => { pool[sig(m)] = (pool[sig(m)] || 0) + 1; });
+        v.forEach(m => {
+          if (pool[sig(m)] > 0) pool[sig(m)]--;
+          else { mine.push(m); changed = true; }
+        });
+        merged.finanzas = mine;
+      } else if (typeof v === 'boolean'){
+        if (v && !merged[k]){ merged[k] = true; changed = true; }
+      } else if (v > (merged[k] || 0)){
+        merged[k] = v; changed = true;
+      }
+    });
+    return [merged, changed];
+  }
+
+  async function importData(file){
+    if (!file) return;
+    if (file.size > 5000000){ dataMsg('El archivo es demasiado grande para ser un respaldo de esta app.'); return; }
+    let data;
+    try { data = JSON.parse(await file.text()); }
+    catch(e){ dataMsg('No se pudo leer el archivo: no es un respaldo válido.'); return; }
+    if (!data || data.app !== 'habitos' || !data.dias || typeof data.dias !== 'object'){
+      dataMsg('Este archivo no es un respaldo de esta app. Usa uno creado con "Exportar datos".');
+      return;
+    }
+    let added = 0, updated = 0, texts = 0, skipped = 0;
+    try{
+      Object.keys(data.dias).forEach(iso => {
+        const incoming = DAY_RE.test(iso) ? cleanDay(data.dias[iso]) : null;
+        if (!incoming){ skipped++; return; }
+        if (Object.keys(incoming).length === 0) return;
+        if (localStorage.getItem(`habitos:${iso}`) === null){ saveDay(iso, incoming); added++; return; }
+        const [merged, changed] = mergeDay(getDay(iso), incoming);
+        if (changed){ saveDay(iso, merged); updated++; }
+      });
+      const importedTexts = data.textos && typeof data.textos === 'object' ? data.textos : {};
+      TEXT_NAMES.forEach(name => {
+        const group = importedTexts[name] && typeof importedTexts[name] === 'object' ? importedTexts[name] : {};
+        Object.keys(group).forEach(iso => {
+          if (!DAY_RE.test(iso) || typeof group[iso] !== 'string'){ skipped++; return; }
+          if (!group[iso] || localStorage.getItem(`${name}:${iso}`)) return;
+          localStorage.setItem(`${name}:${iso}`, group[iso].slice(0, 300));
+          texts++;
+        });
+      });
+    } catch(e){
+      refreshAll();
+      dataMsg('No se pudo guardar todo: el navegador se quedó sin espacio.');
+      return;
+    }
+    refreshAll();
+    dataMsg(`Importado: ${plural(added, 'día nuevo', 'días nuevos')}, ${plural(updated, 'día completado', 'días completados')} y ${plural(texts, 'texto semanal', 'textos semanales')}.` +
+            (skipped ? ` Se omitieron ${plural(skipped, 'dato', 'datos')} con formato inválido.` : ''));
+  }
+
+  let wipeArmed = false, wipeTimer = null;
+  function resetWipeButton(){
+    wipeArmed = false;
+    clearTimeout(wipeTimer);
+    document.getElementById('data-clear').textContent = 'Borrar todo';
+  }
+  function wipeData(){
+    if (!wipeArmed){
+      wipeArmed = true;
+      document.getElementById('data-clear').textContent = '¿Seguro? Toca otra vez';
+      wipeTimer = setTimeout(resetWipeButton, 4000);
+      return;
+    }
+    resetWipeButton();
+    const keys = appKeys();
+    const days = keys.filter(k => k.startsWith('habitos:')).length;
+    keys.forEach(k => localStorage.removeItem(k));
+    refreshAll();
+    dataMsg(`Se borró todo: ${plural(days, 'día', 'días')} de registro. Empiezas de cero.`);
+  }
+
+  document.getElementById('data-export').addEventListener('click', exportData);
+  document.getElementById('data-import').addEventListener('click', () => document.getElementById('data-file').click());
+  document.getElementById('data-file').addEventListener('change', async (e) => {
+    await importData(e.target.files[0]);
+    e.target.value = '';   // permite volver a elegir el mismo archivo
+  });
+  document.getElementById('data-clear').addEventListener('click', wipeData);
 
   (function init(){
     document.getElementById('input-date').value = selectedISO;
